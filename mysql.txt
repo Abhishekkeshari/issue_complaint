@@ -1,9 +1,1 @@
-Username: root
-
-Database name: db
-
-Password: root
-
-Server: MySQL
-
-Port: 3306
+hhh
