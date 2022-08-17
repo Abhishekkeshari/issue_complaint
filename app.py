@@ -3,13 +3,16 @@
 from flask import Flask, render_template, request, redirect, session, url_for
 from flask_mysqldb import MySQL
 import re
+import os
 import smtplib
 
 app = Flask(__name__)
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'root'
-app.config['MYSQL_DB'] = 'db'
+# app.config['MYSQL_HOST'] = 'localhost'
+# app.config['MYSQL_USER'] = 'root'
+# app.config['MYSQL_PASSWORD'] = 'root'
+# app.config['MYSQL_DB'] = 'db'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:Abhishek@localhost/db'
+app.config['DATABASE_URL'] = os.environ.get('DATABASE')
 mysql = MySQL(app)
 app.secret_key = 'apple'
 
