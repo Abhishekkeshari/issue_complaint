@@ -43,7 +43,7 @@ class Users(mysql.Model):
 # routes
 
 # home
-@app.route('/')
+@app.route('/', methods=["GET"])
 def index():
     return render_template("index.html")
 
