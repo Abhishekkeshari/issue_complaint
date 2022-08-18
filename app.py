@@ -166,21 +166,21 @@ def login():
     if request.method == "POST":
         email = request.form['email']
         password = request.form['password']
-        alldata=Users.query.all()
+        # alldata=Users.query.all()
         # cursor = mysql.connection.cursor()
         # cursor.execute('SELECT * FROM Users WHERE email = % s AND password = % s', (email, password))
         # userdetails = cursor.fetchone()
         # print(userdetails)
         # if userdetails:
-            session['loggedin'] = True
-            session['users'] = userdetails[0]
-            session['username'] = userdetails[1]
-            msg = 'Logged in successfully !'
-            return redirect(url_for("home"))
-        else:
-            msg = 'Incorrect username / password !'
-            return render_template("login.html", msg=msg)
-    return render_template('login.html', msg=msg)
+        #     session['loggedin'] = True
+        #     session['users'] = userdetails[0]
+        #     session['username'] = userdetails[1]
+        #     msg = 'Logged in successfully !'
+        #     return redirect(url_for("home"))
+        # else:
+        #     msg = 'Incorrect username / password !'
+        #     return render_template("login.html", msg=msg)
+    return render_template('login.html')
 
 
 # ticket detail
