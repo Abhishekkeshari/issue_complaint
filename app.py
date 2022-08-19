@@ -6,10 +6,12 @@ import smtplib
 
 # app config
 app = Flask(__name__)
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'root'
-app.config['MYSQL_DB'] = 'db'
+# app.config['MYSQL_HOST'] = 'localhost'
+# app.config['MYSQL_USER'] = 'root'
+# app.config['MYSQL_PASSWORD'] = 'root'
+# app.config['MYSQL_DB'] = 'db'
+app.config['DATABASE_URL'] = 'postgresql://bzagdzybruequg:4cc11585edc8d86b137d425a7e3c4a990b5436f11e603c88bab2fb95d62a587f@ec2-3-224-184-9.compute-1.amazonaws.com:5432/d50a747u6h72dj'
+
 mysql = MySQL(app)
 app.secret_key = 'apple'
 
