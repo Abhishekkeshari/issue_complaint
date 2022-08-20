@@ -2,6 +2,7 @@
 from flask import Flask, render_template, request, redirect, session, url_for
 from flask_mysqldb import MySQL
 import re
+import psycopg2
 import smtplib
 import os
 
@@ -31,7 +32,7 @@ def home():
     if ('user' not in session.keys()) or (session['user'] is None):
         return redirect(url_for("login"))
     else:
-        cursor = mysql.connection.cursor()
+        cursor = psycopg2.connection.cursor()
         cursor.execute("SELECT * FROM User WHERE id = % s", [session['user']])
         userdetails = cursor.fetchone()
         if userdetails[4] == 2:
@@ -47,18 +48,18 @@ def home():
                 title = request.form['title']
                 description = request.form['description']
                 cust_id = session['user']
-                cursor = mysql.connection.cursor()
+                cursor = psycopg2.connection.cursor()
                 cursor.execute("SELECT username FROM User WHERE id = % s", [session['user']])
                 username = cursor.fetchone()
                 cursor.execute("INSERT INTO Tickets(customer,customer_name,title,description) VALUES(%s,%s,%s,%s)",
                                (cust_id, username, title, description))
-                mysql.connection.commit()
+                psycopg2.connection.commit()
                 cursor.execute("SELECT * FROM User WHERE id = % s", [session['user']])
                 userdetails = cursor.fetchone()
                 cursor.execute("SELECT * FROM Tickets WHERE customer = %s", [session['user']])
                 tickets = cursor.fetchall()
                 return render_template("home.html", msg="Ticket Filed", user=userdetails, tickets=tickets)
-            cursor = mysql.connection.cursor()
+            cursor = psycopg2.connection.cursor()
             cursor.execute("SELECT * FROM User WHERE id = % s", [session['user']])
             userdetails = cursor.fetchone()
             cursor.execute("SELECT * FROM Tickets WHERE customer = %s", [session['user']])
@@ -74,7 +75,7 @@ def register_account():
         username = request.form['username']
         email = request.form['email']
         password = request.form['password']
-        cursor = mysql.connection.cursor()
+        cursor =psycopg2.connection.cursor()
         cursor.execute('SELECT * FROM User WHERE email = % s', (email,))
         userdetails = cursor.fetchone()
         print(userdetails)
@@ -87,9 +88,9 @@ def register_account():
         else:
             cursor.execute("INSERT INTO User(username,email,password,role) VALUES(% s,% s,% s,% s)",
                            (username, email, password, 0))
-            mysql.connection.commit()
+            psycopg2.connection.commit()
             msg = 'You have successfully registered !'
-            mysql.connection.commit()
+            psycopg2.connection.commit()
             return redirect(url_for("login"))
     elif request.method == 'POST':
         msg = 'Please fill out the form !'
@@ -104,7 +105,7 @@ def agent_register():
         username = request.form['username']
         email = request.form['email']
         password = request.form['password']
-        cursor = mysql.connection.cursor()
+        cursor = psycopg2.connection.cursor()
         cursor.execute('SELECT * FROM User WHERE email = % s', (email,))
         userdetails = cursor.fetchone()
         print(userdetails)
@@ -117,9 +118,9 @@ def agent_register():
         else:
             cursor.execute("INSERT INTO User(username,email,password,role) VALUES(% s,% s,% s,% s)",
                            (username, email, password, 5))
-            mysql.connection.commit()
+            psycopg2.connection.commit()
             msg = 'You have successfully registered !'
-            mysql.connection.commit()
+            psycopg2.connection.commit()
             return redirect("/")
     elif request.method == 'POST':
         msg = 'Please fill out the form !'
@@ -133,7 +134,7 @@ def login():
     if request.method == "POST":
         email = request.form['email']
         password = request.form['password']
-        cursor = mysql.connection.cursor()
+        cursor = psycopg2.connection.cursor()
         cursor.execute('SELECT * FROM User WHERE email = % s AND password = % s', (email, password))
         userdetails = cursor.fetchone()
         print(userdetails)
@@ -152,7 +153,7 @@ def login():
 # ticket detail
 @app.route("/ticket/<int:id>", methods=["GET", "POST"])
 def ticket_detail(id):
-    cursor = mysql.connection.cursor()
+    cursor = psycopg2.connection.cursor()
     cursor.execute("SELECT * FROM Tickets WHERE id = % s", [id])
     ticket = cursor.fetchone()
     cursor.execute("SELECT * FROM User WHERE id = % s", [session['user']])
@@ -172,7 +173,7 @@ def ticket_detail(id):
         cust = str(customer_name)
         cursor.execute("UPDATE Tickets SET agent= %s,agent_name= % s WHERE id = %s", (agent, agent_name, id))
         cursor.execute("UPDATE Tickets SET progress='assigned' WHERE id = %s", [id])
-        mysql.connection.commit()
+        psycopg2.connection.commit()
         cursor.execute("SELECT email FROM User WHERE id=(SELECT customer FROM Tickets WHERE id= % s)", [id])
         email = cursor.fetchall()
         TEXT = "Hello " + cust + ",\n\n" + "Agent " + agt + "is successfully assigned to you.The Agent will contact you soon. To keep a track of your ticket, please visit our website dashboard."
@@ -195,10 +196,10 @@ def admin_register():
         password = request.form['password']
         secret_key = request.form['secret']
         if secret_key == "12345":
-            cursor = mysql.connection.cursor()
+            cursor = psycopg2.connection.cursor()
             cursor.execute("INSERT INTO User(username,email,password,role) VALUES(% s,% s,% s,% s)",
                            (username, email, password, 2))
-            mysql.connection.commit()
+            psycopg2.connection.commit()
             return redirect(url_for("login"))
         else:
             return render_template("admin_register.html", msg="Invlaid Secret")
@@ -211,7 +212,7 @@ def panel():
     id = session['user']
     if id is None:
         return redirect(url_for("login"))
-    cursor = mysql.connection.cursor()
+    cursor = psycopg2.connection.cursor()
     cursor.execute("SELECT * FROM User WHERE id= % s", [id])
     user_details = cursor.fetchone()
     if user_details[4] != 2:
@@ -223,9 +224,9 @@ def panel():
         tickets = cursor.fetchall()
         if request.method == "POST":
             user_id = request.form['admin-candidate']
-            cursor = mysql.connection.cursor()
+            cursor = psycopg2.connection.cursor()
             cursor.execute("UPDATE User SET role=1 WHERE id = % s", (user_id,))
-            mysql.connection.commit()
+            psycopg2.connection.commit()
             return redirect(url_for("panel"))
         return render_template("panel.html", all_users=all_users, user=user_details, tickets=tickets)
 
@@ -233,28 +234,28 @@ def panel():
 # accept ticket
 @app.route("/accept/<int:ticket_id>/<int:user_id>")
 def accept(ticket_id, user_id):
-    cursor = mysql.connection.cursor()
+    cursor = psycopg2.connection.cursor()
     cursor.execute("SELECT * FROM User WHERE id = % s", [user_id])
     agent = cursor.fetchone()
     cursor.execute("SELECT * FROM Tickets WHERE id = % s", [ticket_id])
     ticket = cursor.fetchone()
     if agent[0] == int(ticket[3]):
         cursor.execute("UPDATE Tickets SET progress='accepted' WHERE id = % s", [ticket_id])
-        mysql.connection.commit()
+        psycopg2.connection.commit()
     return redirect(url_for("home"))
 
 
 # delete ticket
 @app.route("/delete/<int:ticket_id>/<int:user_id>")
 def delete(ticket_id, user_id):
-    cursor = mysql.connection.cursor()
+    cursor = psycopg2.connection.cursor()
     cursor.execute("SELECT * FROM User WHERE id = % s", [user_id])
     agent = cursor.fetchone()
     cursor.execute("SELECT * FROM Tickets WHERE id=% s", [ticket_id])
     ticket = cursor.fetchone()
     if agent[0] == int(ticket[3]):
         cursor.execute("DELETE FROM Tickets WHERE id=%s", [ticket_id])
-        mysql.connection.commit()
+        psycopg2.connection.commit()
     return redirect(url_for("home"))
 
 
