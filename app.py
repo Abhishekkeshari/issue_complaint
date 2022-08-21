@@ -1,4 +1,3 @@
-
 # importing modules
 from flask import Flask, render_template, request, redirect, session, url_for
 from flask_mysqldb import MySQL
@@ -13,7 +12,6 @@ app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'root'
 app.config['MYSQL_DB'] = 'db'
 mysql = MySQL(app)
-
 app.secret_key = 'apple'
 
 
