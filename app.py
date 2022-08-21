@@ -3,17 +3,20 @@ from flask import Flask, render_template, request, redirect, session, url_for
 from flask_mysqldb import MySQL
 import re
 import smtplib
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 
 # app config
 app = Flask(__name__)
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'root'
-app.config['MYSQL_DB'] = 'db'
+app.config['MYSQL_HOST'] = os.getenv("MYSQL_HOST")
+app.config['MYSQL_USER'] = os.getenv("MYSQL_USER")
+app.config['MYSQL_PASSWORD'] = os.getenv("MYSQL_PASSWORD")
+app.config['MYSQL_DB'] = os.getenv("MYSQL_DB")
 
 mysql = MySQL(app)
-app.secret_key = 'apple'
+app.config['SECRET_KEY'] = os.getenv("MY_SECRET")
 
 
 # routes
