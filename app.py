@@ -179,8 +179,8 @@ def ticket_detail(id):
         message = 'Subject: {}\n\n{}'.format(SUBJECT, TEXT)
         server = smtplib.SMTP("smtp.gmail.com", 587)
         server.starttls()
-        server.login("customercareabhishek3098@gmail.com", os.environ.get('PASS'))
-        server.sendmail("customercareabhishek3098@gmail.com", email, message)
+        server.login("customercare301998@gmail.com", os.environ.get('PASS'))
+        server.sendmail("customercare301998@gmail.com", email, message)
         return redirect(url_for("panel"))
     return render_template("details.html", ticket=ticket, user=user, all_users=all_users)
 
